@@ -2,14 +2,14 @@
 ESP8266, 32x8 Matrix display for clock and notifications
 
 ### Stage one - (Time digital)
-1. ~~ HTML page to display time ~~
-2.	Read time from server
-3.	Display time on display (digitally)
+1. [x] ~~HTML page to display time~~
+2. [ ]	Read time from server
+3. [ ]	Display time on display (digitally)
 
 ### Stage two - (Scrolling String)
-1.	HTML update, to allow string/message entry.
-2.	Write method to decipher %coding.
-3.	Display string/message on display.
+1. [ ]	HTML update, to allow string/message entry.
+2. [ ]	Write method to decipher %coding.
+3. [ ]	Display string/message on display.
 
 ### Stage three - (Config file, back end)
 1.	HTML update, to include settings
