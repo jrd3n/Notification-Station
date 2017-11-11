@@ -1,23 +1,39 @@
 #include <Arduino.h>
 
-void setup()
-{
-  // initialize LED digital pin as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
+/*
+ * Time_NTP.pde
+ * Example showing time sync to NTP time source
+ *
+ * This sketch uses the ESP8266WiFi library
+ */
+ 
+#include <NTPClient.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+
+const char *ssid     = "Studio20";  //  your network SSID (name)
+const char *password = "Zulu1India2";       // your network password
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
+void setup(){
   Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+
+  while ( WiFi.status() != WL_CONNECTED ) {
+    delay ( 500 );
+    Serial.print ( "." );
+  }
+
+  timeClient.begin();
 }
 
-void loop()
-{
-  // turn the LED on (HIGH is the voltage level)
-  digitalWrite(LED_BUILTIN, HIGH);
+void loop() {
+  timeClient.update();
 
-  // wait for a second
-  delay(1000);
+  Serial.println(timeClient.getFormattedTime());
 
-  // turn the LED off by making the voltage LOW
-  digitalWrite(LED_BUILTIN, LOW);
-
-   // wait for a second
   delay(1000);
 }

@@ -13,6 +13,16 @@
             "problemMatcher": [
                 "$platformio"
             ]
+        },
+        {
+            "type": "PlatformIO",
+            "args": [
+                "device",
+                "monitor"
+            ],
+            "problemMatcher": [
+                "$platformio"
+            ]
         }
     ]
 }
