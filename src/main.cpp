@@ -8,9 +8,12 @@
 const char *ssid = "Studio20";        //  your network SSID (name)
 const char *password = "Zulu1India2"; // your network password
 String WebString = "";
+String TimeString = "";
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
+
+WiFiServer server(80);
 
 void setArduinoClock()
 {
@@ -19,25 +22,6 @@ void setArduinoClock()
 
   timeClient.update();
   setTime(timeClient.getEpochTime()); // set the arduino clock (Timelib) might have to do this every 10 mins or so
-}
-void CompileWebPage()
-{
-
-  File indexFile = SPIFFS.open("/index.htm", "r");
-  if (!indexFile)
-  {
-    Serial.println("file open failed");
-  }
-
-  // WebString.reserve(5000); // this might be useful if we run out of flash memory
-
-  while (indexFile.available())
-  {
-    WebString += indexFile.readStringUntil('\n');
-    WebString += '\n';
-  }
-
-  indexFile.close();
 }
 void StartWifiConnection()
 {
@@ -50,6 +34,71 @@ void StartWifiConnection()
     Serial.print(".");
   }
 }
+void UpdateTimeString() {
+
+TimeString = ""; // clear the string
+TimeString += hour();
+TimeString += ":";
+TimeString += minute();
+TimeString += ":";
+TimeString += second();
+
+}
+void CompileWebPage()
+{
+  WebString = ""; 
+  File indexFile = SPIFFS.open("/index.htm", "r");
+  if (!indexFile)
+  {
+    Serial.println("file open failed");
+  }
+
+  // WebString.reserve(5000); // this might be useful if we run out of flash memory
+
+  WebString += "HTTP/1.1 200 OK";
+  WebString += "Content-Type: text/html";
+
+  WebString += '\n'; // a new line here is important
+
+  while (indexFile.available())
+  {
+    WebString += indexFile.readStringUntil('\n');
+    WebString += '\n';
+  }
+
+  WebString.replace("#TIME_PLACEHOLDER#",TimeString);
+
+  indexFile.close();
+}
+bool clientConnected()
+{
+
+  WiFiClient client = server.available();
+  if (!client)
+  {
+    return false;
+  }
+
+  // DealWithClientRequest(); // i was going to split everthing below this mark, into another function
+
+  // Wait until the client sends some data
+  Serial.println("new client");
+
+  while (!client.available())
+  {
+    delay(1);
+  }
+
+  // Read the first line of the request
+  String request = client.readStringUntil('\r');
+  Serial.println(request);
+  client.flush();
+
+  UpdateTimeString();
+  CompileWebPage();
+  client.print(WebString);
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -61,28 +110,22 @@ void setup()
   setArduinoClock();
 
   SPIFFS.begin();
+
+  server.begin();
+
+  Serial.println("Server started");
+
+  // Print the IP address
+  Serial.print("Use this URL : ");
+  Serial.print("http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("/");
 }
 
 void loop()
 {
-
-  CompileWebPage();
-  Serial.print(WebString);
-
-  // timeClient.update();
-
-  // Serial.println(timeClient.getFormattedTime());
-
-  Serial.print("the hours is : ");
-  Serial.println(hour());
-
-  Serial.print(" the min is: ");
-  Serial.println(minute());
-
-  Serial.print("the second is : ");
-  Serial.println(second());
-
-  // Serial.println(timeClient.getHours());
-
-  // delay(1000);
+  if (!clientConnected())
+  {
+    return;
+  }
 }
