@@ -2,11 +2,11 @@
 
 ### create HTM file
 
-1. use one of these websites
+use one of these websites
 
-    (http://www.layoutit.com/build)
+    ( http://www.layoutit.com/build )
 
-    (https://www.w3schools.com/html/)
+    ( https://www.w3schools.com/html )
 
 ### platform.IO upload to SPIFFS
 

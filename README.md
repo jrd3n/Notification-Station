@@ -2,7 +2,7 @@
 ESP8266, 32x8 Matrix display for clock and notifications
 
 ### Stage one - (Time digital)
-1. [x] ~~ HTML page to display time ~~
+1. [x] ~~HTML page to display time~~
 2. [ ]	Read time from server
 3. [ ]	Display time on display (digitally)
 
