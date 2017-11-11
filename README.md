@@ -2,7 +2,7 @@
 ESP8266, 32x8 Matrix display for clock and notifications
 
 ### Stage one - (Time digital)
-~~ 1.	HTML page to display time ~~
+1. ~~ HTML page to display time ~~
 2.	Read time from server
 3.	Display time on display (digitally)
 
@@ -36,3 +36,8 @@ ESP8266, 32x8 Matrix display for clock and notifications
 ### Stage Six - (Messages) needs input to displays
 1.	HTML update, for what to do on receiving message, beep once…. (need to think)
 2.	Display “message from” [sender] with the option to read() or cancel() using INPUTs
+
+- [x] @mentions, #refs, [links](), **formatting**, and <del>tags</del> supported
+- [x] list syntax required (any unordered or ordered list supported)
+- [x] this is a complete item
+- [ ] this is an incomplete item
