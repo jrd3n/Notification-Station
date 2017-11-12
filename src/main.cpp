@@ -17,11 +17,18 @@ WiFiServer server(80);
 
 void setArduinoClock()
 {
-  // thinking about adding this function to the loop, so that the Arduino clock doesn't get too far out time.
-  // might write something that only updates the clock every 10 minutes or so
+  if (year() <= 1970) // this is so it only starts the timeclient once, unless we go back to 1970 for some reason!
+  {
+    timeClient.begin(); // this is to get time from the NTP client
+    delay(50);
+    timeClient.update();
+  }
 
-  timeClient.update();
-  setTime(timeClient.getEpochTime()); // set the arduino clock (Timelib) might have to do this every 10 mins or so
+  if (minute() % 5 == 0) /// this is so we only do a server time check every 5 minutes.
+  {
+    timeClient.update();
+    setTime(timeClient.getEpochTime()); // set the arduino clock (Timelib) might have to do this every 10 mins or so
+  }
 }
 void StartWifiConnection()
 {
@@ -33,20 +40,44 @@ void StartWifiConnection()
     delay(500);
     Serial.print(".");
   }
-}
-void UpdateTimeString() {
 
-TimeString = ""; // clear the string
-TimeString += hour();
-TimeString += ":";
-TimeString += minute();
-TimeString += ":";
-TimeString += second();
+  server.begin();
+
+  Serial.println("Server started");
+
+  // Print the IP address
+  Serial.print("Use this URL : ");
+  Serial.print("http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("/");
+
+}
+void UpdateTimeString()
+{
+
+  TimeString = ""; // clear the string
+  if (hour() < 10)
+  {
+    TimeString += "0";
+  }
+  TimeString += hour();
+  TimeString += ":";
+  if (minute() < 10)
+  {
+    TimeString += "0";
+  }
+  TimeString += minute();
+  TimeString += ":";
+  if (second() < 10)
+  {
+    TimeString += "0";
+  }
+  TimeString += second();
 
 }
 void CompileWebPage()
 {
-  WebString = ""; 
+  WebString = "";
   File indexFile = SPIFFS.open("/index.htm", "r");
   if (!indexFile)
   {
@@ -66,7 +97,7 @@ void CompileWebPage()
     WebString += '\n';
   }
 
-  WebString.replace("#TIME_PLACEHOLDER#",TimeString);
+  WebString.replace("#TIME_PLACEHOLDER#", TimeString);
 
   indexFile.close();
 }
@@ -105,27 +136,20 @@ void setup()
 
   StartWifiConnection();
 
-  timeClient.begin(); // this is to get time from the NTP client
-
   setArduinoClock();
 
   SPIFFS.begin();
 
-  server.begin();
-
-  Serial.println("Server started");
-
-  // Print the IP address
-  Serial.print("Use this URL : ");
-  Serial.print("http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("/");
 }
 
 void loop()
 {
+
+  setArduinoClock();
+
   if (!clientConnected())
   {
     return;
   }
+
 }
