@@ -74,15 +74,13 @@ void UpdateTimeString()
   }
   TimeString += second();
 }
-void dealWithCleintRequest(String Request) {
-
-
-
+void dealWithCleintRequest(String Request)
+{
 }
-void CompileWebPage()
+void CompileWebPage(String Page = "/index.htm")
 {
   WebString = "";
-  File indexFile = SPIFFS.open("/index.htm", "r");
+  File indexFile = SPIFFS.open(Page, "r");
   if (!indexFile)
   {
     Serial.println("file open failed");
@@ -110,7 +108,6 @@ void clientConnected()
   WiFiClient client = server.available();
   if (client)
   {
-    // DealWithClientRequest(); // i was going to split everthing below this mark, into another function
 
     // Wait until the client sends some data
     Serial.println("new client");
@@ -128,7 +125,7 @@ void clientConnected()
     client.flush();
 
     UpdateTimeString();
-    CompileWebPage();
+    CompileWebPage("/index.htm");
     client.print(WebString);
   }
 }
