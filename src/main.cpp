@@ -9,6 +9,7 @@ const char *ssid = "Studio20";        //  your network SSID (name)
 const char *password = "Zulu1India2"; // your network password
 String WebString = "";
 String TimeString = "";
+String PersentRemain = "";
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
@@ -50,7 +51,6 @@ void StartWifiConnection()
   Serial.print("http://");
   Serial.print(WiFi.localIP());
   Serial.println("/");
-
 }
 void UpdateTimeString()
 {
@@ -73,6 +73,10 @@ void UpdateTimeString()
     TimeString += "0";
   }
   TimeString += second();
+}
+void dealWithCleintRequest(String Request) {
+
+
 
 }
 void CompileWebPage()
@@ -84,7 +88,7 @@ void CompileWebPage()
     Serial.println("file open failed");
   }
 
-  // WebString.reserve(5000); // this might be useful if we run out of flash memory
+  WebString.reserve(indexFile.size() + 500); // this might be useful if we run out of flash memory
 
   WebString += "HTTP/1.1 200 OK";
   WebString += "Content-Type: text/html";
@@ -101,33 +105,32 @@ void CompileWebPage()
 
   indexFile.close();
 }
-bool clientConnected()
+void clientConnected()
 {
-
   WiFiClient client = server.available();
-  if (!client)
+  if (client)
   {
-    return false;
+    // DealWithClientRequest(); // i was going to split everthing below this mark, into another function
+
+    // Wait until the client sends some data
+    Serial.println("new client");
+
+    while (!client.available())
+    {
+      delay(1);
+    }
+
+    // Read the first line of the request
+    String request = client.readStringUntil('\r');
+
+    dealWithCleintRequest(request);
+    Serial.println(request);
+    client.flush();
+
+    UpdateTimeString();
+    CompileWebPage();
+    client.print(WebString);
   }
-
-  // DealWithClientRequest(); // i was going to split everthing below this mark, into another function
-
-  // Wait until the client sends some data
-  Serial.println("new client");
-
-  while (!client.available())
-  {
-    delay(1);
-  }
-
-  // Read the first line of the request
-  String request = client.readStringUntil('\r');
-  Serial.println(request);
-  client.flush();
-
-  UpdateTimeString();
-  CompileWebPage();
-  client.print(WebString);
 }
 
 void setup()
@@ -139,17 +142,10 @@ void setup()
   setArduinoClock();
 
   SPIFFS.begin();
-
 }
 
 void loop()
 {
-
   setArduinoClock();
-
-  if (!clientConnected())
-  {
-    return;
-  }
-
+  clientConnected();
 }
